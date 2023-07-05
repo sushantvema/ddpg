@@ -9,7 +9,6 @@ class CriticNetwork(keras.Model):
         super(CriticNetwork, self).__init__()
         self.fc1_dims = fc1_dims
         self.fc2_dims = fc2_dims
-        self.n_actions = n_actions
 
         self.model_name = name
         self.checkpoint_dir = chkpt_dir
@@ -21,7 +20,7 @@ class CriticNetwork(keras.Model):
         self.q = Dense(1, activation=None)
 
     def call(self, state, action):
-        action_value = self.fc1(tf.concat([state, action]), axis=1)
+        action_value = self.fc1(tf.concat([state, action], axis=1))
         action_value = self.fc2(action_value)
 
         q = self.q(action_value)

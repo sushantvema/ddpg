@@ -19,7 +19,7 @@ class Agent:
         self.min_action = env.action_space.low[0]
 
         self.actor = ActorNetwork(n_actions=n_actions, name='actor')
-        self.critic = CriticNetwork(n_actions=n_actions, name='critic')
+        self.critic = CriticNetwork(name='critic')
         self.target_actor = ActorNetwork(n_actions=n_actions,
                                          name='target_actor')
         self.target_critic = CriticNetwork(name='target_critic')
@@ -90,7 +90,7 @@ class Agent:
         with tf.GradientTape() as tape:
             target_actions = self.target_actor(states_)
             critic_value_ = tf.squeeze(self.target_critic(
-                                            states_, target_actions, 1))
+                                            states_, target_actions), 1)
             critic_value = tf.squeeze(self.critic(states, actions, 1))
             target = reward + self.gamma*critic_value_ * (1-done)
             critic_loss = keras.losses.MSE(target, critic_value)
