@@ -1,13 +1,13 @@
 import numpy as np
 import tensorflow as tf
 import tensorflow.keras as keras
-from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.optimizers.legacy import Adam
 from buffer import ReplayBuffer
 from networks import ActorNetwork, CriticNetwork
 
 class Agent:
     def __init__(self, input_dims, alpha=0.001, beta=0.002,
-                  env=None, gamma=0.99, n_actions=2, max_size=1000000, 
+                  env=None, gamma=0.99, n_actions=1, max_size=1000000, 
                   tau=0.005, fc1=400, fc2=300, batch_size=64, noise=0.1):
         self.gamma = gamma
         self.tau = tau
@@ -65,7 +65,7 @@ class Agent:
         self.target_critic.load_weights(self.target_critic.checkpoint_file)
 
     def choose_action(self, observation, evaluate=False):
-        state = tf.convert_to_tensor([observation], dtype=tf.float32)
+        state = tf.convert_to_tensor([observation[0]], dtype=tf.float32)
         actions = self.actor(state)
         if not evaluate:
             actions += tf.random.normal(shape=[self.n_actions],

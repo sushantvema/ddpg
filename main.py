@@ -4,7 +4,7 @@ from ddpg_tf2 import Agent
 from utils import plot_learning_curve
 
 if __name__ == '__main__':
-    env = gym.make('Pendulum-v0')
+    env = gym.make('Pendulum-v1')
     agent = Agent(input_dims=env.observation_space.shape,
                   env=env, n_actions=env.action_space.shape[0])
     
@@ -21,7 +21,7 @@ if __name__ == '__main__':
         while n_steps <= agent.batch_size:
             observation = env.reset()
             action = env.action_space.sample()
-            observation_, reward, done, info = env.step(action)
+            observation_, reward, done, truncated, info = env.step(action)
             agent.remember(observation, action, reward, observation_, done)
             n_steps += 1
         agent.learn
@@ -31,12 +31,12 @@ if __name__ == '__main__':
         evaluate = False
 
     for i in range(n_games):
-        observation = env.reset()
+        observation = env.reset()[0]
         done = False
         score = 0
         while not done:
             action = agent.choose_action(observation, evaluate)
-            observation_, reward, done, info = env.step(action)
+            observation_, reward, done, truncated, info = env.step(action)
             score += reward
             agent.remember(observation, action, reward, observation_, done)
             if not load_checkpoint:
