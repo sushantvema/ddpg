@@ -8,7 +8,7 @@ from networks import ActorNetwork, CriticNetwork
 class Agent:
     def __init__(self, input_dims, alpha=0.001, beta=0.002,
                   env=None, gamma=0.99, n_actions=1, max_size=1000000, 
-                  tau=0.005, fc1=400, fc2=300, batch_size=64, noise=0.1):
+                  tau=0.005, fc1=400, fc2=300, batch_size=2, noise=0.1):
         self.gamma = gamma
         self.tau = tau
         self.memory = ReplayBuffer(max_size, input_dims, n_actions)
@@ -65,7 +65,8 @@ class Agent:
         self.target_critic.load_weights(self.target_critic.checkpoint_file)
 
     def choose_action(self, observation, evaluate=False):
-        state = tf.convert_to_tensor([observation[0]], dtype=tf.float32)
+        observation = np.expand_dims(observation[0], axis=0)
+        state = tf.convert_to_tensor([observation], dtype=tf.float32)
         actions = self.actor(state)
         if not evaluate:
             actions += tf.random.normal(shape=[self.n_actions],
@@ -91,7 +92,7 @@ class Agent:
             target_actions = self.target_actor(states_)
             critic_value_ = tf.squeeze(self.target_critic(
                                             states_, target_actions), 1)
-            critic_value = tf.squeeze(self.critic(states, actions, 1))
+            critic_value = tf.squeeze(self.critic(states, actions), 1)
             target = reward + self.gamma*critic_value_ * (1-done)
             critic_loss = keras.losses.MSE(target, critic_value)
 
